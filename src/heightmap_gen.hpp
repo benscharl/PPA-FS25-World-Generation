@@ -17,9 +17,9 @@ struct HeightmapConfig {
 };
 
 class MapGenerator {
-public:
-  HeightMap generate_heightmap_seq(const PerlinNoise &noise,
-                                   const HeightmapConfig &config) {
+ public:
+  HeightMap generate_heightmap_seq(const PerlinNoise& noise,
+                                   const HeightmapConfig& config) {
     parlay::internal::timer t(std::string("sequential"));
     HeightMap heightmap(config.width, config.height);
     for (int x = 0; x < config.width; x++) {
@@ -36,8 +36,8 @@ public:
     return heightmap;
   }
 
-  HeightMap generate_heightmap_par(const PerlinNoise &noise,
-                                   const HeightmapConfig &config) {
+  HeightMap generate_heightmap_par(const PerlinNoise& noise,
+                                   const HeightmapConfig& config) {
     parlay::internal::timer t(std::string("parallel"));
     HeightMap heightmap(config.width, config.height);
     parlay::parallel_for(0, config.width * config.height, [&](size_t i) {
@@ -56,8 +56,8 @@ public:
     return heightmap;
   }
 
-  HeightMap generate_heightmap_cuda(const PerlinNoiseCuda &noise,
-                                    const HeightmapConfig &config) {
+  HeightMap generate_heightmap_cuda(const PerlinNoiseCuda& noise,
+                                    const HeightmapConfig& config) {
     HeightMap heightmap(config.width, config.height);
     heightmap.data = noise.generate_normalized_heightmap(
         config.octaves, config.frequency,
@@ -65,8 +65,8 @@ public:
     return heightmap;
   }
 
-  HeightMap generate_heightmap_hybrid(PerlinNoiseHybrid &noise,
-                                      const HeightmapConfig &config) {
+  HeightMap generate_heightmap_hybrid(PerlinNoiseHybrid& noise,
+                                      const HeightmapConfig& config) {
     HeightMap heightmap(config.width, config.height);
     heightmap.data = noise.generate_normalized_heightmap(
         config.octaves, config.frequency,
@@ -74,31 +74,28 @@ public:
     return heightmap;
   }
 
-private:
-  void normalize_seq(HeightMap &heightmap) {
+ private:
+  void normalize_seq(HeightMap& heightmap) {
     auto minmax =
         std::minmax_element(heightmap.data.begin(), heightmap.data.end());
     float min_val = *minmax.first;
     float max_val = *minmax.second;
     float range = max_val - min_val;
 
-    if (range <= 0.00001)
-      return;
+    if (range <= 0.00001) return;
 
     for (size_t i = 0; i < heightmap.data.size(); i++) {
       heightmap.data[i] = (heightmap.data[i] - min_val) / range;
     }
   }
 
-  void normalize(HeightMap &heightmap) {
-    auto minmax =
-        parlay::minmax_element(heightmap.data);
+  void normalize(HeightMap& heightmap) {
+    auto minmax = parlay::minmax_element(heightmap.data);
     float min_val = *minmax.first;
     float max_val = *minmax.second;
     float range = max_val - min_val;
 
-    if (range <= 0.00001)
-      return;
+    if (range <= 0.00001) return;
 
     parlay::parallel_for(0, heightmap.data.size(), [&](size_t i) {
       heightmap.data[i] = (heightmap.data[i] - min_val) / range;

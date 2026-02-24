@@ -1,9 +1,9 @@
 #include <cuda_runtime.h>
+#include <parlay/sequence.h>
 #include <thrust/execution_policy.h>
 #include <thrust/extrema.h>
 
 #include <glm/glm.hpp>
-#include <parlay/sequence.h>
 #include <random>
 
 #include "parlay/internal/get_time.h"
