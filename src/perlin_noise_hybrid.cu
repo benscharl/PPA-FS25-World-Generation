@@ -31,7 +31,15 @@ struct PerlinNoiseHybrid::Impl {
     for (int i = 0; i < 512; i++) {
       unified_perm[i] = p[i % 256];
     }
+
+    int device_id;
+    cudaGetDevice(&device_id);
+    cudaMemLocation location{cudaMemLocationTypeDevice, device_id};
+    cudaMemAdvise(unified_perm.data(), PERM_SIZE * sizeof(int),
+                  cudaMemAdviseSetReadMostly, location);
   }
+
+  ~Impl() { cudaStreamDestroy(gpu_stream); }
 };
 
 PerlinNoiseHybrid::PerlinNoiseHybrid(unsigned int seed,
@@ -42,15 +50,12 @@ PerlinNoiseHybrid::PerlinNoiseHybrid(unsigned int seed,
   cudaStreamCreate(&impl->gpu_stream);
 }
 
-PerlinNoiseHybrid::~PerlinNoiseHybrid() {
-  cudaStreamDestroy(impl->gpu_stream);
-};
+PerlinNoiseHybrid::~PerlinNoiseHybrid() = default;
 
 void PerlinNoiseHybrid::generate_heightmap(int32_t octaves, float frequency,
                                            glm::vec2 dim) {
   world_size = (size_t)(dim.x * dim.y);
-  size_t gen_split_point =
-      impl->gen_split_point_percent * world_size;  //* sizeof(float);
+  size_t gen_split_point = impl->gen_split_point_percent * world_size;
 
   // ? Unitialized cooks the perf
   heightmap = parlay::sequence<float>(world_size);
@@ -64,6 +69,8 @@ void PerlinNoiseHybrid::generate_heightmap(int32_t octaves, float frequency,
                               octaves, freq_x, freq_y);
   parlay::par_do(
       [&]() {
+        cudaMemsetAsync(gpu_part.begin(), 0, gpu_part.size() * sizeof(float),
+                        impl->gpu_stream);
         thrust::transform(
             thrust::cuda::par.on(impl->gpu_stream),
             thrust::make_counting_iterator<size_t>(0),
@@ -114,5 +121,5 @@ parlay::sequence<float> PerlinNoiseHybrid::generate_normalized_heightmap(
   t.next("normalization (gpu+cpu concurrent)");
   t.total();
 
-  return std::move(heightmap);
+  return heightmap;
 }
