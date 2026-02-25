@@ -35,6 +35,8 @@ target_compile_options(benchmark_world_gen
             -Wno-subobject-linkage
             -Wno-overflow
             -Wfatal-errors
+            -Wall 
+            -Wextra
         >
 )
 
