@@ -12,15 +12,16 @@
 #include "perlin_noise_cuda.hpp"
 
 struct PerlinNoiseCuda::Impl {
+  static constexpr int PERM_SIZE = 512;
   parlay::sequence<int> permutation;
   cudaStream_t stream;
 
-  Impl(unsigned int seed) : permutation(512) {
+  Impl(unsigned int seed) : permutation(PERM_SIZE) {
     auto p = parlay::tabulate<int>(256, [](size_t i) { return (int)i; });
     std::default_random_engine engine(seed);
     std::shuffle(p.begin(), p.end(), engine);
 
-    for (int i = 0; i < 512; i++) {
+    for (int i = 0; i < PERM_SIZE; i++) {
       permutation[i] = p[i % 256];
     }
 
@@ -47,6 +48,8 @@ parlay::sequence<float> PerlinNoiseCuda::generate_normalized_heightmap(
 
   PerlinFunctor perlinFunctor(impl->permutation.data(), (int)dim.x, (int)dim.y,
                               octaves, freq_x, freq_y);
+  cudaMemsetAsync(heightmap.begin(), 0, heightmap.size() * sizeof(float),
+                  impl->stream);
 
   thrust::transform(thrust::cuda::par.on(impl->stream),
                     thrust::make_counting_iterator<size_t>(0),
