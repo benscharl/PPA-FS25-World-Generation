@@ -1,3 +1,5 @@
 /.vscode
 /build
 .cache/
+*.nsys-rep
+*.sqlite
