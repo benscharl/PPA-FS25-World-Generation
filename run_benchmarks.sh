@@ -1,7 +1,7 @@
 #!/bin/bash
 
 output_file="benchmark_results.csv"
-echo "dimension,seed,threads,heightmap_avg_time,tree_avg_time" > "$output_file"
+echo "dimension,seed,threads,heightmap_avg_time" > "$output_file"
 
 # Dimensions to test
 dims=(1024 2048 4096 8192)
@@ -27,8 +27,7 @@ for dim in "${dims[@]}"; do
         fi
       fi
       heightmap_avg=$(echo "$output" | grep "average" | head -1 | awk '{print $2}')
-      tree_avg=$(echo "$output" | grep "average" | tail -1 | awk '{print $2}')
-      echo "$dim,$seed,$thread,$heightmap_avg,$tree_avg" >> "$output_file"
+      echo "$dim,$seed,$thread,$heightmap_avg" >> "$output_file"
     done
   done
 done

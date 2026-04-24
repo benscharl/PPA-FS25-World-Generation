@@ -67,6 +67,5 @@ src/
   heightmap_gen.hpp       -- MapGenerator class with all four generation paths
   benchmark.hpp           -- Benchmark harness and timer logic
   cmd_parser.hpp          -- Command-line argument parsing
-  tree_gen.hpp            -- Tree placement based on heightmap/moisture maps (partially implemented)
 include/                  -- Vendored: glm, parlay, moderngpu
 ```

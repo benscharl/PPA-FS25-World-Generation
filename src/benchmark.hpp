@@ -6,7 +6,6 @@
 
 #include "cmd_parser.hpp"
 #include "heightmap_gen.hpp"
-#include "tree_gen.hpp"
 
 double WARMUP_TIME_THRESHOLD = 3.0;
 int BENCHMARK_QUANTITY = 10;
