@@ -28,7 +28,7 @@ for dim in "${dims[@]}"; do
 
       echo "Running CUDA..."
 
-      cuda_output=$(./build/benchmark_world_gen -dim "$dim" -seed "$seed" -c 2>&1)
+      cuda_output=$(./../build/benchmark_world_gen -dim "$dim" -seed "$seed" -c 2>&1)
 
       if echo "$cuda_output" | grep -q "FAILED"; then
         echo "CUDA correctness check failed for dim=$dim, seed=$seed"

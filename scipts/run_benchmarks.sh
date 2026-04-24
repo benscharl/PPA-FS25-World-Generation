@@ -18,7 +18,7 @@ for dim in "${dims[@]}"; do
       echo "Running benchmark: dim=$dim, seed=$seed, threads=$thread"
 
       if [ "$thread" -eq 1 ]; then
-        output=$(./build/benchmark_world_gen -dim "$dim" -seed "$seed" -s 2>&1)
+        output=$(./../build/benchmark_world_gen -dim "$dim" -seed "$seed" -s 2>&1)
       else
         output=$(PARLAY_NUM_THREADS="$thread" ./build/benchmark_world_gen -dim "$dim" -seed "$seed" -p 2>&1)
         if echo "$output" | grep -q "FAILED"; then
