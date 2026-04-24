@@ -7,8 +7,8 @@
 #include "cmd_parser.hpp"
 #include "heightmap_gen.hpp"
 
-double WARMUP_TIME_THRESHOLD = 3.0;
-int BENCHMARK_QUANTITY = 10;
+inline constexpr WARMUP_TIME_THRESHOLD = 3.0;
+inline constexpr BENCHMARK_QUANTITY = 10;
 
 bool test_correctness(const HeightMap& ref, const HeightMap& candidate,
                       float delta = 1e-4) {
