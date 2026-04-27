@@ -1,4 +1,4 @@
-# World Generation Benchmark
+# Terrain Generation Benchmark
 
 Performance comparison of Perlin noise heightmap generation across different execution models: sequential CPU, parallel CPU (Parlay), CUDA GPU, and a hybrid approach that splits work between both.
 
